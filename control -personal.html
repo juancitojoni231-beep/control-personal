@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Control de Personal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --card: #161616;
+  --card2: #1f1f1f;
+  --tx: #ffffff;
+  --mut: #a3a3a3;
+  --ac: #ff2e93;
+  --ac2: #ff8a1f;
+  --bd: #2e2e2e;
+  --bad: #ff5a5a;
+  --ok: #ff2e93;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--ac) 18%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 110% 0%, color-mix(in srgb, var(--ac2) 16%, transparent), transparent 60%),
+    var(--bg);
+  color: var(--tx);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+#app { max-width: 860px; margin: 0 auto; padding: 18px 16px 40px; }
+h2 { margin: 0 0 12px; font-size: 19px; letter-spacing: -.01em; }
+.mut { color: var(--mut); }
+.c { text-align: center; }
+.brand {
+  font-weight: 700;
+  color: var(--mut);
+  text-align: center;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 6px;
+}
+.clock {
+  font-size: 64px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  margin-top: 4px;
+}
+.status {
+  display: inline-block;
+  margin: 8px auto 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ac) 16%, transparent);
+  color: var(--ac);
+  font-weight: 600;
+  font-size: 14px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+button, input, select { font: inherit; color: inherit; }
+.btn {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform .12s ease, border-color .15s ease;
+  box-shadow: 0 1px 0 rgba(255,255,255,.03) inset;
+}
+.btn:active { transform: scale(.97); }
+.btn:hover { border-color: var(--ac); }
+.emp { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px; }
+.emp .av, .av.sm {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ac), var(--ac2));
+  border-radius: 14px;
+}
+.emp .av { width: 44px; height: 44px; font-size: 18px; margin-bottom: 4px; }
+.av.sm { width: 36px; height: 36px; font-size: 15px; border-radius: 12px; }
+.emp b { font-size: 16px; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mut);
+}
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bd);
+}
+.dot.on {
+  background: var(--ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 22%, transparent);
+}
+.emp.in { border-color: color-mix(in srgb, var(--ok) 55%, var(--bd)); }
+.emp.alert {
+  border-color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 10%, var(--card));
+}
+.emp.alert .badge { color: var(--bad); }
+.pri {
+  background: linear-gradient(135deg, var(--ac), var(--ac2));
+  color: #fff;
+  border-color: transparent;
+  text-align: center;
+  font-weight: 700;
+}
+.bad { color: var(--bad); }
+.sm { padding: 8px 12px; border-radius: 10px; font-size: 14px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 10px 30px -18px rgba(0,0,0,.35);
+}
+.card2 {
+  background: var(--card2);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 300px;
+  margin: 16px auto;
+}
+.pad .btn {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 600;
+  padding: 18px 0;
+  border-radius: 20px;
+}
+.dots {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin: 16px 0;
+}
+.dots i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--mut);
+  transition: all .15s;
+}
+.dots i.f {
+  background: var(--ac);
+  border-color: var(--ac);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--ac) 60%, transparent);
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: var(--card2);
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid var(--bd);
+  overflow-x: auto;
+}
+.tabs .btn {
+  padding: 9px 14px;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.tabs .btn:hover { border: 0; }
+.tabs .sel {
+  background: var(--card);
+  box-shadow: 0 2px 10px -4px rgba(0,0,0,.4);
+}
+input, select {
+  background: var(--card2);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 10px;
+  width: 100%;
+  outline: none;
+}
+input:focus, select:focus { border-color: var(--ac); }
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: end;
+  margin-bottom: 10px;
+}
+.row > * { flex: 1; min-width: 120px; }
+.chk {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--tx);
+  font-size: 15px;
+  flex: 0;
+  min-width: 0;
+  font-weight: 500;
+}
+.chk input { width: auto; }
+.sc { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+th, td {
+  padding: 10px 6px;
+  border-bottom: 1px solid var(--bd);
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  color: var(--mut);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.tag {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.tag.in {
+  background: color-mix(in srgb, var(--ok) 18%, transparent);
+  color: var(--ok);
+}
+.tag.out {
+  background: color-mix(in srgb, var(--ac2) 18%, transparent);
+  color: var(--ac2);
+}
+.ok {
+  font-size: 22px;
+  text-align: center;
+  padding: 44px 12px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 22%, var(--card)), var(--card));
+  border: 1px solid var(--bd);
+}
+label {
+  font-size: 13px;
+  color: var(--mut);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.stat {
+  background: var(--card2);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 12px;
+  text-align: center;
+}
+.stat b {
+  display: block;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.stat span {
+  font-size: 12px;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.frow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--bd);
+  flex-wrap: wrap;
+}
+.erow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+  flex-wrap: wrap;
+}
+@media print {
+  body { background: #fff; color: #000; }
+  .noprint, .tabs, button { display: none !important; }
+  .card { box-shadow: none; border: 0; background: #fff; }
+  #app { max-width: none; }
+}
+.sgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+  margin: 6px 0 14px;
+}
+.sday {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card2);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+.sday span { font-weight: 700; min-width: 34px; }
+.sday select { padding: 6px 8px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="app"><p class="c mut">Cargando…</p></div>
+
+<script>
+const MS = 36e5, DAY = 864e5;
+const DN = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const STORAGE_KEY = 'control_personal_v1';
+
+let db = { employees: [], punches: [], excused: [], config: null, periods: [] };
+let loaded = false;
+let view = 'kiosk', tab = 'hoy';
+let pinFor = null, pin = '', msg = '', okMsg = '';
+let delId = null, delEmp = null, delPer = null, closeArmed = false;
+let editId = null, hist = null, rep = null, fal = null;
+let ptsMes = null, ptsLoading = false;
+let from = dk(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+let to = dk(new Date());
+
+const app = document.getElementById('app');
+
+// ─── Helpers ───────────────────────────────────────────────
+function dk(t) {
+  const d = new Date(t);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function today0() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function hm(t) {
+  return new Date(t).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+}
+function minOf(t) {
+  const d = new Date(t);
+  return d.getHours() * 60 + d.getMinutes();
+}
+function hmToMin(s) {
+  const p = String(s || '08:00').split(':');
+  return (+p[0]) * 60 + (+p[1] || 0);
+}
+function fd(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+function cfgv(k) {
+  const d = { tol: 5, otH: 8, otX: 1.5, cur: '$', cierre: '20:00', salida1: '13:00', vuelta: '16:00' };
+  const x = db.config ? db.config[k] : undefined;
+  return x == null || x === '' ? d[k] : (['cur', 'cierre', 'salida1', 'vuelta'].includes(k) ? x : Number(x));
+}
+function money(n) {
+  return cfgv('cur') + ' ' + Number(n || 0).toLocaleString('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function hrs(h) {
+  const m = Math.round((h || 0) * 60);
+  return Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm';
+}
+function name(id) {
+  const e = db.employees.find(x => x.id === id);
+  return e ? e.name : '(eliminado)';
+}
+function active() {
+  return db.employees.filter(e => e.active !== false).sort((a, b) => a.name.localeCompare(b.name));
+}
+function openSince(id) {
+  const list = db.punches.filter(p => p.emp === id).sort((a, b) => a.t - b.t);
+  const last = list[list.length - 1];
+  return last && last.type === 'in' ? last.t : 0;
+}
+function inside(id) {
+  return !!openSince(id);
+}
+function exOf(id, k) {
+  return db.excused.find(x => x.emp === id && x.day === k);
+}
+function vv(id) {
+  const x = document.getElementById(id);
+  return x ? x.value.trim() : '';
+}
+function okPin(p) {
+  return /^\d{4}$/.test(p);
+}
+function bossId() {
+  const b = db.employees.find(x => x.boss);
+  return b ? b.id : null;
+}
+function schedOf(e) {
+  return Array.isArray(e.sched) ? e.sched : [0,1,2,3,4,5,6].map(i => (e.days || [1,2,3,4,5,6]).includes(i) ? 'full' : 'off');
+}
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+function fail(e) {
+  msg = 'Error: ' + ((e && e.message) || e);
+  render();
+}
+
+// ─── Persistencia ──────────────────────────────────────────
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  } catch (e) {
+    console.error('No se pudo guardar', e);
+  }
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      db.employees = data.employees || [];
+      db.punches = data.punches || [];
+      db.excused = data.excused || [];
+      db.config = data.config || null;
+      db.periods = data.periods || [];
+    }
+  } catch (e) {
+    console.error('Error al cargar', e);
+  }
+  loaded = true;
+}
+
+// ─── Análisis de horas ─────────────────────────────────────
+function analyze(e, a, b, ps) {
+  const days = {};
+  let st = null;
+  ps.filter(p => p.emp === e.id).forEach(p => {
+    if (p.type === 'in') {
+      if (st != null) days[dk(st)].open = true;
+      st = p.t;
+      const k = dk(p.t);
+      days[k] = days[k] || { ms: 0, first: null, open: false };
+      if (days[k].first == null) days[k].first = p.t;
+    } else if (st != null) {
+      days[dk(st)].ms += p.t - st;
+      days[dk(st)].lastOut = p.t;
+      st = null;
+    }
+  });
+  if (st != null) days[dk(st)].open = true;
+
+  const tol = cfgv('tol'), otH = cfgv('otH'), otX = cfgv('otX');
+  const ent = hmToMin(e.entry), rate = Number(e.rate) || 0;
+  let H = 0, OT = 0, pay = 0, late = 0, lateDays = 0, open = 0;
+
+  Object.values(days).forEach(D => {
+    const h = D.ms / MS;
+    const ot = Math.max(0, h - otH);
+    H += h;
+    OT += ot;
+    pay += (h - ot + ot * otX) * rate;
+    if (D.open) open++;
+  });
+
+  const bid = bossId();
+  const bossFirst = {};
+  if (bid) {
+    ps.forEach(p => {
+      if (p.emp === bid && p.type === 'in') {
+        const k = dk(p.t);
+        if (!bossFirst[k] || p.t < bossFirst[k]) bossFirst[k] = p.t;
+      }
+    });
+  }
+
+  ps.filter(p => p.emp === e.id && p.type === 'in').forEach(p => {
+    const st = schedOf(e)[new Date(p.t).getDay()];
+    let ref = st === 'tarde' || minOf(p.t) >= hmToMin(cfgv('salida1'))
+      ? hmToMin(cfgv('vuelta'))
+      : ent;
+    const bf = bid && e.id !== bid ? bossFirst[dk(p.t)] : null;
+    if (bf) ref = Math.max(ref, minOf(bf));
+    const l = Math.max(0, minOf(p.t) - (ref + tol));
+    if (l > 0) { late += l; lateDays++; }
+  });
+
+  const exp = [];
+  const end = Math.min(b - DAY, today0() - DAY);
+  const d = new Date(Math.max(a, e.since || 0));
+  d.setHours(0, 0, 0, 0);
+  for (; d.getTime() <= end; d.setDate(d.getDate() + 1)) {
+    const k = dk(d.getTime());
+    if (schedOf(e)[d.getDay()] !== 'off' && !days[k]) exp.push(k);
+  }
+
+  let qued = 0;
+  const cierreMin = hmToMin(cfgv('cierre'));
+  Object.values(days).forEach(D => {
+    if (D.lastOut && minOf(D.lastOut) >= cierreMin + 5) qued++;
+  });
+
+  const ex = !!bid && e.id === bid;
+  if (ex) qued = 0;
+  const tard = ex ? 0 : lateDays;
+  const bon = Math.floor(qued / 3);
+  const ded = Math.floor(tard / 3);
+  pay += (bon - ded) * rate;
+
+  return { H, OT, pay, late, lateDays, open, exp, days, tard, qued, bon, ded, pts: qued - tard };
+}
+
+function rangeMs() {
+  return [
+    new Date(from + 'T00:00:00').getTime(),
+    new Date(to + 'T00:00:00').getTime() + DAY
+  ];
+}
+
+function fetchRange(a, b) {
+  return db.punches
+    .filter(p => p.t >= a && p.t < b)
+    .sort((x, y) => x.t - y.t);
+}
+
+// ─── Vistas ────────────────────────────────────────────────
+function kiosk() {
+  const a = active();
+  const n = a.filter(e => inside(e.id)).length;
+  app.innerHTML = `
+    <div class="brand" style="color:var(--ac)">Control de Personal</div>
+    <div class="brand" style="margin-top:2px;font-size:12px;letter-spacing:.08em">Sistema de fichaje</div>
+    <div class="clock" id="clk"></div>
+    <p class="c mut" id="dte"></p>
+    <p class="c"><span class="status">${a.length ? n + ' de ' + a.length + ' dentro ahora' : 'Sin empleados'}</span></p>
+    ${a.length ? `
+      <div class="grid">
+        ${a.map(e => {
+          const t = openSince(e.id);
+          const alert = t && (Date.now() - t > 12 * MS || t < today0());
+          const lbl = alert
+            ? '⚠ Turno abierto desde ' + (t < today0() ? 'ayer' : hm(t))
+            : t ? 'Dentro desde ' + hm(t) : 'Fuera';
+          return `
+            <button class="btn emp\( {t ? ' in' : ''} \){alert ? ' alert' : ''}" data-a="pick" data-id="${esc(e.id)}">
+              <div class="av">${esc(e.name.charAt(0).toUpperCase())}</div>
+              <b>${esc(e.name)}</b>
+              <span class="badge"><span class="dot\( {t ? ' on' : ''}"></span> \){lbl}</span>
+            </button>`;
+        }).join('')}
+      </div>` : '<p class="c mut">Aún no hay empleados. Entra a Administración para agregarlos.</p>'}
+    <p class="c"><button class="btn sm" data-a="admin" style="background:transparent">⚙︎ Administración</button></p>
+    \( {msg ? `<p class="c bad"> \){esc(msg)}</p>` : ''}
+  `;
+  tick();
+}
+
+function tick() {
+  const c = document.getElementById('clk');
+  if (!c) return;
+  const n = new Date();
+  c.textContent = n.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const dte = document.getElementById('dte');
+  if (dte) dte.textContent = n.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+setInterval(tick, 1000);
+
+function pinScreen() {
+  const who = pinFor.kind === 'admin' ? 'Administración' : name(pinFor.id);
+  app.innerHTML = `
+    <div class="card c">
+      <h2>${esc(who)}</h2>
+      <p class="mut">Escribe tu PIN</p>
+      <div class="dots">\( {[0,1,2,3].map(i => `<i class=" \){i < pin.length ? 'f' : ''}"></i>`).join('')}</div>
+      <p class="bad" style="min-height:22px">${esc(msg)}</p>
+      <div class="pad">
+        \( {[1,2,3,4,5,6,7,8,9].map(n => `<button class="btn" data-a="d" data-n=" \){n}">${n}</button>`).join('')}
+        <button class="btn" data-a="cancel">✕</button>
+        <button class="btn" data-a="d" data-n="0">0</button>
+        <button class="btn" data-a="back">⌫</button>
+      </div>
+    </div>`;
+}
+
+function bad() {
+  pin = '';
+  msg = 'PIN incorrecto';
+  render();
+}
+
+function checkPin() {
+  if (pinFor.kind === 'admin') {
+    if (pin === String(db.config.adminPin)) {
+      view = 'admin';
+      tab = 'hoy';
+      msg = '';
+      pin = '';
+      render();
+    } else bad();
+    return;
+  }
+  const e = db.employees.find(x => x.id === pinFor.id);
+  if (!e || pin !== String(e.pin)) {
+    bad();
+    return;
+  }
+  const t = Date.now();
+  const type = inside(e.id) ? 'out' : 'in';
+  let extra = '';
+  if (type === 'in') {
+    const first = !db.punches.some(p => p.emp === e.id && p.type === 'in' && dk(p.t) === dk(t));
+    const st = schedOf(e)[new Date(t).getDay()];
+    let ref = st === 'tarde' || minOf(t) >= hmToMin(cfgv('salida1'))
+      ? hmToMin(cfgv('vuelta'))
+      : hmToMin(e.entry);
+    const bid = bossId();
+    let pending = false;
+    if (bid && e.id !== bid) {
+      const bf = db.punches
+        .filter(p => p.emp === bid && p.type === 'in' && dk(p.t) === dk(t))
+        .sort((a, b) => a.t - b.t)[0];
+      if (bf) ref = Math.max(ref, minOf(bf.t));
+      else pending = true;
+    }
+    const late = (pending || e.id === bid) ? 0 : Math.max(0, minOf(t) - (ref + cfgv('tol')));
+    if (pending) extra = '<br><span class="mut">Se confirma cuando fiche el encargado</span>';
+    else if (late > 0) extra = '<br><span class="bad">Tardanza · −1 punto</span>';
+    else if (first) extra = '<br><span class="mut">A tiempo</span>';
+  } else {
+    const bid = bossId();
+    extra = (minOf(t) >= hmToMin(cfgv('cierre')) + 5 && e.id !== bid)
+      ? '<br><span class="mut">Quedada después de hora · +1 punto</span>'
+      : `<br><span class="mut">Turno: ${hrs((t - openSince(e.id)) / MS)}</span>`;
+  }
+  db.punches.push({ id: uid(), emp: e.id, type, t });
+  save();
+  okMsg = (type === 'in' ? '✅ Ingreso' : '👋 Egreso') +
+    ` registrado<br><b>\( {esc(e.name)}</b><br><span class="mut"> \){hm(t)}</span>${extra}`;
+  view = 'done';
+  pin = '';
+  msg = '';
+  render();
+  setTimeout(() => { view = 'kiosk'; render(); }, 3500);
+}
+
+function setup() {
+  app.innerHTML = `
+    <div class="card">
+      <h2>Configuración inicial</h2>
+      <p class="mut">Crea el PIN de administrador (4 dígitos) y la moneda.</p>
+      <div class="row">
+        <div><label>PIN de administrador</label><input id="s_pin" inputmode="numeric" maxlength="4"></div>
+        <div><label>Moneda</label><input id="s_cur" value="$" maxlength="5"></div>
+      </div>
+      <button class="btn pri" data-a="savecfg">Guardar</button>
+      <button class="btn sm" data-a="cancel">Cancelar</button>
+      <p class="bad">${esc(msg)}</p>
+    </div>`;
+}
+
+function adminView() {
+  const T = [['hoy', 'Hoy'], ['faltas', 'Faltas'], ['pagos', 'Pagos'], ['emp', 'Empleados']];
+  let h = `
+    <div class="brand" style="color:var(--ac);margin-bottom:10px">Control de Personal</div>
+    <div class="tabs noprint">
+      \( {T.map(t => `<button class="btn \){tab === t[0] ? ' sel' : ''}" data-a="tab" data-t="\( {t[0]}"> \){t[1]}</button>`).joi
